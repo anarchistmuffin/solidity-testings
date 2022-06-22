@@ -47,7 +47,7 @@ contract  Router is RouterOpcodes, RouteRegistry {
 
     event RouteControllerChanged(address indexed _controllerRouter, address indexed _routeController, opCodeRouteTypes);
 
-    bytes32 private constant routeIdentifier = keccak256("akx.libRouter.router");
+    bytes32 private constant routeIdentifier = keccak256("akx.router.v1");
     bytes4 private constant routerMagic = bytes4(routeIdentifier);
     bytes32 public DOMAIN_SEPARATOR;
 
