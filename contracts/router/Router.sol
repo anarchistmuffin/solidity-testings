@@ -43,12 +43,13 @@ abstract contract RouterOpcodes {
     }
 
 
-contract  Router is RouterOpcodes, RouteRegistry, ERC20Permit {
+contract  Router is RouterOpcodes, RouteRegistry {
 
     event RouteControllerChanged(address indexed _controllerRouter, address indexed _routeController, opCodeRouteTypes);
 
     bytes32 private constant routeIdentifier = keccak256("akx.libRouter.router");
     bytes4 private constant routerMagic = bytes4(routeIdentifier);
+    bytes32 public DOMAIN_SEPARATOR;
 
     string constant NAME = "ROUTER";
     string constant REVISION = "1";
@@ -78,7 +79,8 @@ contract  Router is RouterOpcodes, RouteRegistry, ERC20Permit {
     mapping(bytes1 => bool) private _allowedOpcodes;
     mapping(address => uint) private _nonces;
 
-    constructor(address[] memory allowedContractsAddresses) ERC20(NAME, "AKXROUTER") ERC20Permit(NAME)  {
+    constructor(address[] memory allowedContractsAddresses)  {
+        DOMAIN_SEPARATOR = keccak256(abi.encode(routeIdentifier, routerMagic));
        _setup(allowedContractsAddresses);
     }
 
@@ -169,7 +171,7 @@ contract  Router is RouterOpcodes, RouteRegistry, ERC20Permit {
     bytes32 structHash = keccak256(
       abi.encode(routerMagic, routeController, uint256(routeType), nonce, expiry)
     );
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", this.DOMAIN_SEPARATOR(), structHash));
+    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
     address signatory = ecrecover(digest, v, r, s);
     require(signatory != address(0), "INVALID_SIGNATURE");
     require(nonce == _nonces[signatory]++, "INVALID_NONCE");
@@ -195,7 +197,7 @@ contract  Router is RouterOpcodes, RouteRegistry, ERC20Permit {
     bytes32 s
   ) public {
     bytes32 structHash = keccak256(abi.encode(routeIdentifier, routeController, nonce, expiry));
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", this.DOMAIN_SEPARATOR(), structHash));
+    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
     address signatory = ecrecover(digest, v, r, s);
     require(signatory != address(0), "INVALID_SIGNATURE");
     require(nonce == _nonces[signatory]++, "INVALID_NONCE");
