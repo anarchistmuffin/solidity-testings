@@ -55,7 +55,7 @@ contract  Router is RouterOpcodes, RouteRegistry, ERC20Permit {
 
     mapping(opCodeRouteTypes => address) private _mapopcodeToRoute;
 
-    address private _routesRegistry;
+  
 
     enum opCodeRouteTypes  {
         PUBLIC,
